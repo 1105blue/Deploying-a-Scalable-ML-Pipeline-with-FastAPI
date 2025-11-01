@@ -1,6 +1,3 @@
----
-
-````markdown
 # Deploying a Scalable Machine Learning Pipeline with FastAPI
 
 This project builds and deploys a complete machine learning pipeline for predicting income levels using the U.S. Census dataset. The pipeline includes model training, automated testing, continuous integration, and API deployment.  
@@ -197,5 +194,3 @@ Machine Learning DevOps Student – WGU / Udacity
 📂 GitHub: [1105blue](https://github.com/1105blue)
 
 ```
-
----

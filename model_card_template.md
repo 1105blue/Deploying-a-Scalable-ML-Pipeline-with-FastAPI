@@ -1,6 +1,3 @@
----
-
-```markdown
 # 🧾 Model Card – Census Income Classification Model
 
 ---
@@ -132,5 +129,3 @@ B.S. Data Analytics Candidate – Western Governors University
 Machine Learning DevOps Portfolio Project  
 📂 GitHub: [1105blue](https://github.com/1105blue)
 ```
-
----
