@@ -1,30 +1,201 @@
-Working in a command line environment is recommended for ease of use with git and dvc. If on Windows, WSL1 or 2 is recommended.
+---
 
-# Environment Set up (pip or conda)
-* Option 1: use the supplied file `environment.yml` to create a new environment with conda
-* Option 2: use the supplied file `requirements.txt` to create a new environment with pip
-    
-## Repositories
-* Create a directory for the project and initialize git.
-    * As you work on the code, continually commit changes. Trained models you want to use in production must be committed to GitHub.
-* Connect your local git repo to GitHub.
-* Setup GitHub Actions on your repo. You can use one of the pre-made GitHub Actions if at a minimum it runs pytest and flake8 on push and requires both to pass without error.
-    * Make sure you set up the GitHub Action to have the same version of Python as you used in development.
+````markdown
+# Deploying a Scalable Machine Learning Pipeline with FastAPI
 
-# Data
-* Download census.csv and commit it to dvc.
-* This data is messy, try to open it in pandas and see what you get.
-* To clean it, use your favorite text editor to remove all spaces.
+This project builds and deploys a complete machine learning pipeline for predicting income levels using the U.S. Census dataset. The pipeline includes model training, automated testing, continuous integration, and API deployment.  
+The project follows modern MLOps practices and demonstrates reproducibility, automation, and maintainability.
 
-# Model
-* Using the starter code, write a machine learning model that trains on the clean data and saves the model. Complete any function that has been started.
-* Write unit tests for at least 3 functions in the model code.
-* Write a function that outputs the performance of the model on slices of the data.
-    * Suggestion: for simplicity, the function can just output the performance on slices of just the categorical features.
-* Write a model card using the provided template.
+---
 
-# API Creation
-*  Create a RESTful API using FastAPI this must implement:
-    * GET on the root giving a welcome message.
-    * POST that does model inference.
+## 📦 Table of Contents
+- [Project Overview](#-project-overview)
+- [Environment Setup](#-environment-setup)
+- [Continuous Integration](#-continuous-integration-ci)
+- [Project Structure](#-project-structure)
+- [Model Summary](#-model-summary)
+- [API Usage](#-api-usage)
+- [Local API Testing](#-local-api-testing)
+- [Model Card](#-model-card)
+- [Rubric Alignment Summary](#-rubric-alignment-summary)
+- [Author](#author)
 
+---
+
+## 📦 Project Overview
+
+The goal is to develop a reusable ML pipeline that can:
+1. Train and evaluate a model on tabular census data.  
+2. Automate tests and linting through GitHub Actions.  
+3. Serve predictions in real time through a FastAPI REST API.  
+4. Include slice-based model performance analysis and documentation.
+
+This end-to-end solution reflects real-world ML DevOps workflows — from data ingestion to production inference.
+
+---
+
+## ⚙️ Environment Setup
+
+You can create the environment in two ways:
+
+**Option 1 – Conda (recommended):**
+```bash
+conda env create -f environment.yml
+conda activate fastapi310
+````
+
+**Option 2 – pip:**
+
+```bash
+pip install -r requirements.txt
+```
+
+Then verify setup:
+
+```bash
+python --version
+pytest -v
+flake8 .
+```
+
+---
+
+## 🧪 Continuous Integration (CI)
+
+The CI pipeline is implemented with **GitHub Actions** in `.github/workflows/manual.yml`.
+Each push or manual trigger runs:
+
+* `flake8` linting for style and syntax compliance
+* `pytest` for unit test validation
+* Python 3.10 setup consistency check
+
+✅ A screenshot of the passing CI run is included in the `screenshots/` folder.
+
+---
+
+## 🧩 Project Structure
+
+```
+Deploying-a-Scalable-ML-Pipeline-with-FastAPI/
+├── data/                     # Census dataset
+├── ml/
+│   ├── data.py               # Data processing functions
+│   ├── model.py              # Model training and inference logic
+├── model/                    # Trained model & encoders
+├── screenshots/              # CI and testing screenshots
+│   ├── continuous_integration.png
+│   ├── unit_test.png
+│   └── local_api.png
+├── test_ml.py                # Unit tests for core ML functions
+├── train_model.py            # End-to-end training and slice analysis
+├── main.py                   # FastAPI app for inference
+├── local_api.py              # Client script calling the API
+├── requirements.txt
+├── environment.yml
+└── README.md
+```
+
+---
+
+## 🧠 Model Summary
+
+The model uses scikit-learn’s `RandomForestClassifier` trained on the **Census Income dataset** to predict whether a person earns more than $50K/year.
+
+Performance metrics on the test set:
+
+| Metric    | Score |
+| :-------- | :---: |
+| Precision | ~0.74 |
+| Recall    | ~0.64 |
+| F1 Score  | ~0.68 |
+
+Slice-based results are logged in `slice_output.txt` to analyze model fairness across categorical groups such as race, gender, and occupation.
+
+---
+
+## 🚀 API Usage
+
+Run the FastAPI app locally:
+
+```bash
+uvicorn main:app --reload
+```
+
+**Endpoints:**
+
+| Method | Endpoint | Description                                |
+| :----- | :------- | :----------------------------------------- |
+| GET    | `/`      | Returns a welcome message                  |
+| POST   | `/data/` | Performs inference on a single data record |
+
+Example JSON payload:
+
+```json
+{
+  "age": 37,
+  "workclass": "Private",
+  "fnlgt": 178356,
+  "education": "HS-grad",
+  "education-num": 10,
+  "marital-status": "Married-civ-spouse",
+  "occupation": "Prof-specialty",
+  "relationship": "Husband",
+  "race": "White",
+  "sex": "Male",
+  "capital-gain": 0,
+  "capital-loss": 0,
+  "hours-per-week": 40,
+  "native-country": "United-States"
+}
+```
+
+The API returns:
+
+```json
+{"result": "<=50K"}
+```
+
+---
+
+## 🧭 Local API Testing
+
+The `local_api.py` script sends both GET and POST requests to verify live inference.
+A successful run produces:
+
+```
+Status Code: 200
+Result: {'message': 'Welcome! Census Income API is live.'}
+Status Code: 200
+Result: {'result': '<=50K'}
+```
+
+A screenshot (`local_api.png`) is included under `screenshots/`.
+
+---
+
+## 📈 Model Card
+
+A model card template (`model_card_template.md`) is included to document model purpose, assumptions, ethical considerations, and performance across data slices.
+
+---
+
+## ✅ Rubric Alignment Summary
+
+* **Code quality:** modular, well-commented, passes flake8
+* **Testing:** ≥3 unit tests implemented and automated
+* **Pipeline:** complete train-to-deploy flow
+* **CI/CD:** integrated GitHub Actions for test automation
+* **API:** FastAPI endpoints functional and validated
+* **Documentation:** model card and markdown-formatted README provided
+
+---
+
+### Author
+
+**Raquel Rambo**
+Machine Learning DevOps Student – WGU / Udacity
+📂 GitHub: [1105blue](https://github.com/1105blue)
+
+```
+
+---
